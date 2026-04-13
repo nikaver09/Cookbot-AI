@@ -1,6 +1,5 @@
 import { useState } from "react";
-import Chatbot from "../components/Chatbot";
-import Sidebar from "../components/Sidebar";
+import CookbotUI from "../CookbotUI";
 
 type Message = {
   role: "user" | "bot";
@@ -17,10 +16,12 @@ export default function App() {
   const [chats, setChats] = useState<Chat[]>([]);
   const [activeChat, setActiveChat] = useState<number | null>(null);
   const [input, setInput] = useState("");
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
 
-  const currentChat = chats.find((c) => c.id === activeChat);
+  const currentChat = activeChat
+    ? chats.find((c) => c.id === activeChat)
+    : undefined;
 
-  // CREATE CHAT
   const createChat = () => {
     const newChat: Chat = {
       id: Date.now(),
@@ -32,13 +33,11 @@ export default function App() {
     setActiveChat(newChat.id);
   };
 
-  // SEND MESSAGE
   const handleSend = () => {
     if (!input.trim()) return;
 
     let chatId = activeChat;
 
-    // create chat if none exists
     if (!chatId) {
       const newChat: Chat = {
         id: Date.now(),
@@ -75,20 +74,17 @@ export default function App() {
   };
 
   return (
-    <div className="appContainer">
-      <Sidebar
-        chats={chats}
-        activeChat={activeChat ?? 0}
-        setActiveChat={setActiveChat}
-        createChat={createChat}
-      />
-
-      <Chatbot
-        messages={currentChat?.messages || []}
-        input={input}
-        setInput={setInput}
-        handleSend={handleSend}
-      />
-    </div>
+    <CookbotUI
+      chats={chats}
+      activeChat={activeChat ?? -1}
+      setActiveChat={setActiveChat}
+      createChat={createChat}
+      messages={currentChat?.messages || []}
+      input={input}
+      setInput={setInput}
+      handleSend={handleSend}
+      theme={theme}
+      setTheme={setTheme}
+    />
   );
 }

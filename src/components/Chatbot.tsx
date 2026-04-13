@@ -12,6 +12,8 @@ type Props = {
   input: string;
   setInput: (val: string) => void;
   handleSend: () => void;
+  theme: "dark" | "light";
+  setTheme: (t: "dark" | "light") => void;
 };
 
 export default function Chatbot({
@@ -19,10 +21,11 @@ export default function Chatbot({
   input,
   setInput,
   handleSend,
+  theme,
+  setTheme,
 }: Props) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
-  // ✅ Smooth scroll function (ChatGPT-style behavior)
   const scrollToBottom = (smooth = true) => {
     bottomRef.current?.scrollIntoView({
       behavior: smooth ? "smooth" : "auto",
@@ -30,32 +33,46 @@ export default function Chatbot({
     });
   };
 
-  // ✅ Auto scroll when messages update
+  // Auto-scroll when messages change
   useEffect(() => {
-    scrollToBottom(true);
+    requestAnimationFrame(() => {
+      scrollToBottom(true);
+    });
   }, [messages]);
 
-  // ✅ Send + scroll together (important for instant UX)
+  // Send message + ensure scroll after DOM update
   const handleSendAndScroll = () => {
     handleSend();
 
-    // ensures DOM updates first before scrolling
     requestAnimationFrame(() => {
       scrollToBottom(true);
     });
   };
 
   return (
-    <div className="chatContainer">
-      {/* MESSAGE AREA */}
+    <div className={`chatContainer ${theme}`}>
+      {/* TOP BAR */}
+      <div className="topbar">
+        <div className="logo">Cookbot</div>
+
+        <button
+          className="toggle"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+        >
+          <div className={`knob ${theme}`} />
+        </button>
+      </div>
+
+      {/* MESSAGES */}
       <div className="messages">
-        <AnimatePresence>
+        <AnimatePresence initial={false}>
           {messages.map((m, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
               className={`msg ${m.role}`}
             >
               {m.text}
@@ -63,17 +80,18 @@ export default function Chatbot({
           ))}
         </AnimatePresence>
 
-        {/* 👇 Scroll anchor */}
         <div ref={bottomRef} />
       </div>
 
-      {/* INPUT AREA */}
+      {/* INPUT */}
       <div className="promptBar">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Chat in Cookbot"
-          onKeyDown={(e) => e.key === "Enter" && handleSendAndScroll()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSendAndScroll();
+          }}
         />
 
         <button onClick={handleSendAndScroll}>

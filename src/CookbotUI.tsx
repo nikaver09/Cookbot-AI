@@ -21,6 +21,9 @@ type Props = {
   input: string;
   setInput: (val: string) => void;
   handleSend: () => void;
+
+  theme: "dark" | "light";
+  setTheme: (t: "dark" | "light") => void;
 };
 
 export default function CookbotUI({
@@ -32,10 +35,12 @@ export default function CookbotUI({
   input,
   setInput,
   handleSend,
+  theme,
+  setTheme,
 }: Props) {
   return (
     <div className="appLayout">
-      {/* LEFT SIDE */}
+
       <Sidebar
         chats={chats}
         activeChat={activeChat}
@@ -43,12 +48,14 @@ export default function CookbotUI({
         createChat={createChat}
       />
 
-      {/* RIGHT SIDE */}
+
       <Chatbot
         messages={messages}
         input={input}
         setInput={setInput}
         handleSend={handleSend}
+        theme={theme}
+        setTheme={setTheme}
       />
     </div>
   );
