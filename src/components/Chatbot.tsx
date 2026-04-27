@@ -1,5 +1,4 @@
-import { useEffect, useRef } from "react";
-import { Send } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Message = {
@@ -26,6 +25,8 @@ export default function Chatbot({
 }: Props) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
+  /* ================= AUTO SCROLL ================= */
+
   const scrollToBottom = (smooth = true) => {
     bottomRef.current?.scrollIntoView({
       behavior: smooth ? "smooth" : "auto",
@@ -33,14 +34,12 @@ export default function Chatbot({
     });
   };
 
-  // Auto-scroll when messages change
   useEffect(() => {
     requestAnimationFrame(() => {
       scrollToBottom(true);
     });
   }, [messages]);
 
-  // Send message + ensure scroll after DOM update
   const handleSendAndScroll = () => {
     handleSend();
 
@@ -48,6 +47,32 @@ export default function Chatbot({
       scrollToBottom(true);
     });
   };
+
+  /* ================= DYNAMIC PLACEHOLDER ================= */
+
+  const placeholders = [
+    "Ask for a recipe...",
+    "What can I cook today?",
+    "Plan a healthy meal...",
+    "Suggest a dinner idea...", 
+    "How do I make pasta?",
+  ];
+
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+
+  useEffect(() => {
+    if (input) return;
+
+    const interval = setInterval(() => {
+      setPlaceholderIndex((prev) =>
+        (prev + 1) % placeholders.length
+      );
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [input]);
+
+  /* ================= UI ================= */
 
   return (
     <div className={`chatContainer ${theme}`}>
@@ -57,7 +82,9 @@ export default function Chatbot({
 
         <button
           className="toggle"
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          onClick={() =>
+            setTheme(theme === "dark" ? "light" : "dark")
+          }
         >
           <div className={`knob ${theme}`} />
         </button>
@@ -84,18 +111,49 @@ export default function Chatbot({
       </div>
 
       {/* INPUT */}
-      <div className="promptBar">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Chat in Cookbot"
-          onKeyDown={(e) => {
-            if (e.key === "Enter") handleSendAndScroll();
-          }}
-        />
+     <div className="promptBar">
+  <div className="inputWrapper">
 
-        <button onClick={handleSendAndScroll}>
-          <Send size={18} />
+    {/* Smooth animated placeholder */}
+    {!input && (
+      <AnimatePresence mode="wait">
+        <motion.span
+          key={placeholderIndex}
+          className="animatedPlaceholder"
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{
+            duration: 0.25,
+            ease: "easeOut",
+          }}
+        >
+          {placeholders[placeholderIndex]}
+        </motion.span>
+      </AnimatePresence>
+    )}
+
+    <input
+      value={input}
+      onChange={(e) => setInput(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") handleSendAndScroll();
+      }}
+    />
+
+  </div>
+
+        <button
+          onClick={handleSendAndScroll}
+          className="sendButton"
+          disabled={!input.trim()}
+        >
+          <img
+            src="/icon/right-arrow.png"
+            alt="send"
+            width="18"
+            height="18"
+          />
         </button>
       </div>
     </div>

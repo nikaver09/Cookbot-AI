@@ -18,6 +18,13 @@ export default function App() {
   const [input, setInput] = useState("");
   const [theme, setTheme] = useState<"dark" | "light">("dark");
 
+  /* FIX — Add these */
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prev) => !prev);
+  };
+
   const currentChat = activeChat
     ? chats.find((c) => c.id === activeChat)
     : undefined;
@@ -85,6 +92,10 @@ export default function App() {
       handleSend={handleSend}
       theme={theme}
       setTheme={setTheme}
+
+      /* PASS THEM HERE */
+      isSidebarOpen={isSidebarOpen}
+      toggleSidebar={toggleSidebar}
     />
   );
 }
