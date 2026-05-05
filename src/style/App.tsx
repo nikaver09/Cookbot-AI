@@ -40,7 +40,7 @@ export default function App() {
     setActiveChat(newChat.id);
   };
 
-  const handleSend = () => {
+  const handleSend = async() => {
     if (!input.trim()) return;
 
     let chatId = activeChat;
@@ -78,6 +78,65 @@ export default function App() {
     );
 
     setInput("");
+    try {
+  const ingredients = input
+    .split(",")
+    .map((i) => i.trim());
+
+  const response = await fetch(
+    "http://127.0.0.1:8000/recommend",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ingredients: ingredients,
+      }),
+    }
+  );
+
+  const data = await response.json();
+
+  const botMessage: Message = {
+    role: "bot",
+    text:
+      `Recommended Dish: ${data.dish}
+
+Steps:
+${data.steps}`,
+  };
+
+  setChats((prev) =>
+    prev.map((chat) =>
+      chat.id === chatId
+        ? {
+            ...chat,
+            messages: [...chat.messages, botMessage],
+          }
+        : chat
+    )
+  );
+
+} catch (error) {
+  console.error(error);
+
+  const errorMessage: Message = {
+    role: "bot",
+    text: "Error: Could not connect to AI backend.",
+  };
+
+  setChats((prev) =>
+    prev.map((chat) =>
+      chat.id === chatId
+        ? {
+            ...chat,
+            messages: [...chat.messages, errorMessage],
+          }
+        : chat
+    )
+  );
+}
   };
 
   return (
