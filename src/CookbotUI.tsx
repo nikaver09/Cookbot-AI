@@ -3,6 +3,7 @@ import Chatbot from "./components/Chatbot";
 import { PanelLeftOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+/* ✅ KEEP TYPES CONSISTENT WITH APP */
 type Message = {
   role: "user" | "bot";
   text: string;
@@ -11,6 +12,7 @@ type Message = {
 type Chat = {
   id: number;
   title: string;
+  messages: Message[]; // ✅ IMPORTANT FIX
 };
 
 type Props = {
@@ -18,7 +20,7 @@ type Props = {
   toggleSidebar: () => void;
 
   chats: Chat[];
-  activeChat: number;
+  activeChat: number | null; // ✅ FIXED
   setActiveChat: (id: number) => void;
   createChat: () => void;
 
@@ -55,28 +57,16 @@ export default function CookbotUI({
       }}
     >
       {/* OPEN BUTTON */}
-
       <AnimatePresence>
         {!isSidebarOpen && (
           <motion.button
             key="open-btn"
             className="open-sidebar-btn"
             onClick={toggleSidebar}
-            initial={{
-              opacity: 0,
-              x: -20,
-            }}
-            animate={{
-              opacity: 1,
-              x: 0,
-            }}
-            exit={{
-              opacity: 0,
-              x: -20,
-            }}
-            transition={{
-              duration: 0.2,
-            }}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.2 }}
           >
             <PanelLeftOpen size={20} />
           </motion.button>
@@ -84,29 +74,17 @@ export default function CookbotUI({
       </AnimatePresence>
 
       {/* SIDEBAR */}
-
       <AnimatePresence mode="wait">
         {isSidebarOpen && (
           <motion.div
             key="sidebar"
-            initial={{
-              x: -260,
-              opacity: 0,
-            }}
-            animate={{
-              x: 0,
-              opacity: 1,
-            }}
-            exit={{
-              x: -260,
-              opacity: 0,
-            }}
-            transition={{
-              duration: 0.28,
-              ease: "easeInOut",
-            }}
+            initial={{ x: -260, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: -260, opacity: 0 }}
+            transition={{ duration: 0.28, ease: "easeInOut" }}
             style={{
               height: "100%",
+              flexShrink: 0, // ✅ prevents layout break
             }}
           >
             <Sidebar
@@ -122,12 +100,13 @@ export default function CookbotUI({
       </AnimatePresence>
 
       {/* CHATBOT */}
-
       <motion.div
         layout
         style={{
           flex: 1,
           overflow: "hidden",
+          display: "flex",        // ✅ important
+          flexDirection: "column",
         }}
       >
         <Chatbot

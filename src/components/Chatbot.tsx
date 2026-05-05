@@ -21,7 +21,6 @@ export default function Chatbot({
   setInput,
   handleSend,
   theme,
-  setTheme,
 }: Props) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
@@ -80,14 +79,6 @@ export default function Chatbot({
       <div className="topbar">
         <div className="logo">Cookbot</div>
 
-        <button
-          className="toggle"
-          onClick={() =>
-            setTheme(theme === "dark" ? "light" : "dark")
-          }
-        >
-          <div className={`knob ${theme}`} />
-        </button>
       </div>
 
       {/* MESSAGES */}
@@ -128,7 +119,7 @@ export default function Chatbot({
             ease: "easeOut",
           }}
         >
-          {placeholders[placeholderIndex]}
+          {placeholders[placeholderIndex]}d
         </motion.span>
       </AnimatePresence>
     )}

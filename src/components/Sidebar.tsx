@@ -3,8 +3,8 @@ import {
   useAnimation,
   AnimatePresence,
 } from "framer-motion";
-import { useCallback } from "react";
-import { PanelLeft } from "lucide-react";
+import { useCallback, useState, useEffect } from "react";
+import { PanelLeft, MessageSquarePlus } from "lucide-react";
 
 type Chat = {
   id: number;
@@ -14,9 +14,8 @@ type Chat = {
 type Props = {
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
-
   chats: Chat[];
-  activeChat: number;
+  activeChat: number | null;
   setActiveChat: (id: number) => void;
   createChat: () => void;
 };
@@ -25,6 +24,54 @@ const SIDEBAR_WIDTH = {
   expanded: 260,
   collapsed: 72,
 };
+
+/* ✅ TOOLTIP COMPONENT */
+function TooltipItem({
+  children,
+  label,
+  isExpanded,
+}: {
+  children: React.ReactNode;
+  label: string;
+  isExpanded: boolean;
+}) {
+  const [hovered, setHovered] = useState(false);
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    let t: any;
+    if (hovered) {
+      t = setTimeout(() => setShow(true), 120);
+    } else {
+      setShow(false);
+    }
+    return () => clearTimeout(t);
+  }, [hovered]);
+
+  return (
+    <div
+      style={{ position: "relative" }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      {children}
+
+      <AnimatePresence>
+        {!isExpanded && show && (
+          <motion.div
+            className="tooltip"
+            initial={{ opacity: 0, x: -12, scale: 0.95 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            exit={{ opacity: 0, x: -12, scale: 0.95 }}
+            transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
+          >
+            {label}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export default function Sidebar({
   isSidebarOpen,
@@ -36,157 +83,147 @@ export default function Sidebar({
 }: Props) {
   const logoControls = useAnimation();
 
+  const [isHovered, setIsHovered] = useState(false);
+
+  /* ✅ COMBINED LOGIC */
+  const isExpanded = isSidebarOpen || isHovered;
+
   const handleLogoClick = useCallback(async () => {
     await logoControls.start({
       rotate: 360,
-      transition: {
-        duration: 0.5,
-        ease: "easeInOut",
-      },
+      transition: { duration: 0.5, ease: "easeInOut" },
     });
 
-    // Reset rotation so animation is consistent every click
     logoControls.set({ rotate: 0 });
-
     window.location.reload();
   }, [logoControls]);
 
-  const sidebarWidth = isSidebarOpen
-    ? SIDEBAR_WIDTH.expanded
-    : SIDEBAR_WIDTH.collapsed;
-
   return (
-    <motion.aside
-      layout="size"
-      className="sidebar"
-      initial={false}
-      animate={{ width: sidebarWidth }}
-      transition={{
-        duration: 0.28,
-        ease: "easeInOut",
-      }}
-      style={{
-        flexShrink: 0,
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      {/* HEADER */}
-
-      <div className="sidebar-header">
-        <motion.img
-          src="/cookbot11.png"
-          alt="Cookbot Logo"
-          className="logo"
-          onClick={handleLogoClick}
-          animate={logoControls}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          draggable={false}
-        />
-
-        <AnimatePresence>
-          {isSidebarOpen && (
-            <motion.button
-              key="close-btn"
-              className="close-btn"
-              onClick={toggleSidebar}
-              aria-label="Collapse sidebar"
-              initial={{ opacity: 0, x: 10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 10 }}
-              transition={{ duration: 0.2 }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              type="button"
-            >
-              <PanelLeft size={18} />
-            </motion.button>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* CONTENT */}
-
+    <>
+      {/* FLOATING BUTTON */}
       <AnimatePresence mode="wait">
-        {isSidebarOpen && (
-          <motion.div
-            key="sidebar-content"
-            layout
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-             transition={{ duration: 0.25 }}
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              height: "100%",
-              overflow: "hidden",
-            }}
+        {!isExpanded && (
+          <motion.button
+            className="floating-toggle"
+            onClick={toggleSidebar}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
           >
-            <div className="mb-4">
+            <PanelLeft size={18} />
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      <motion.aside
+        className="sidebar"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        initial={false}
+        animate={{
+          width: isExpanded
+            ? SIDEBAR_WIDTH.expanded
+            : SIDEBAR_WIDTH.collapsed,
+        }}
+        transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          overflow: "visible", // ✅ IMPORTANT for tooltip
+          flexShrink: 0,
+        }}
+      >
+        {/* HEADER */}
+        <div className="sidebar-header">
+          <motion.img
+            src="/cookbot11.png"
+            alt="Cookbot Logo"
+            className="logo"
+            onClick={handleLogoClick}
+            animate={logoControls}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            draggable={false}
+          />
+
+          <AnimatePresence>
+            {isExpanded && (
+              <motion.button
+                className="close-btn"
+                onClick={toggleSidebar}
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+              >
+                <PanelLeft size={18} />
+              </motion.button>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* CONTENT */}
+        <motion.div
+          animate={{
+            opacity: isExpanded ? 1 : 0,
+            x: isExpanded ? 0 : -10,
+          }}
+          transition={{ duration: 0.15 }}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            pointerEvents: isExpanded ? "auto" : "none",
+          }}
+        >
+          {/* NEW CHAT */}
+          <div className="mb-4">
+            <TooltipItem label="New Chat" isExpanded={isExpanded}>
               <motion.button
                 className="new-chat-btn"
                 onClick={createChat}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                type="button"
               >
-                New Chat
+                <MessageSquarePlus size={18} className="icon" />
+                {isExpanded && <span>New Chat</span>}
               </motion.button>
-            </div>
+            </TooltipItem>
+          </div>
 
-            {/* CHAT LIST */}
+          {/* CHAT LIST */}
+          <div className="flex-1 overflow-y-auto">
+            {chats.length === 0 ? (
+              <motion.p className="empty">
+                No history yet
+              </motion.p>
+            ) : (
+              chats.map((chat) => {
+                const isActive = activeChat === chat.id;
 
-            <div
-              className="flex-1"
-              style={{
-                overflowY: "auto",
-              }}
-            >
-              {chats.length === 0 ? (
-                <motion.p
-                  className="empty"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                >
-                  No history yet
-                </motion.p>
-              ) : (
-                chats.map((chat) => {
-                  const isActive = activeChat === chat.id;
-
-                  return (
+                return (
+                  <TooltipItem
+                    key={chat.id}
+                    label={chat.title || "Untitled"}
+                    isExpanded={isExpanded}
+                  >
                     <motion.div
-                      key={chat.id}
-                      layout
-                      role="button"
-                      tabIndex={0}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                      className={`chat-item ${isActive ? "active" : ""}`}
                       onClick={() => setActiveChat(chat.id)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          setActiveChat(chat.id);
-                        }
-                      }}
-                      className={`chat-item ${
-                        isActive ? "active" : ""
-                      }`}
                     >
                       <span className="chat-title">
-                        {chat.title}
+                        {isExpanded
+                          ? chat.title || "Untitled"
+                          : (chat.title?.charAt(0) || "?")}
                       </span>
                     </motion.div>
-                  );
-                })
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.aside>
+                  </TooltipItem>
+                );
+              })
+            )}
+          </div>
+        </motion.div>
+      </motion.aside>
+    </>
   );
 }
+
