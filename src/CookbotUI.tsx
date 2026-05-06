@@ -1,7 +1,7 @@
 import Sidebar from "./components/Sidebar";
 import Chatbot from "./components/Chatbot";
 import { motion } from "framer-motion";
-
+import { useEffect, useState } from "react";
 
 type Message = {
   role: "user" | "bot";
@@ -49,13 +49,29 @@ export default function CookbotUI({
   theme,
   setTheme,
 }: Props) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkScreen = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    checkScreen();
+
+    window.addEventListener("resize", checkScreen);
+
+    return () => {
+      window.removeEventListener("resize", checkScreen);
+    };
+  }, []);
+
   return (
     <div
       className="appLayout"
       style={{
         display: "flex",
         width: "100%",
-        height: "100vh",
+        height: "100dvh",
         overflow: "hidden",
         position: "relative",
       }}
@@ -64,7 +80,13 @@ export default function CookbotUI({
           SIDEBAR
       ========================= */}
       <motion.div
-        layout
+        animate={{
+          width: isSidebarOpen
+            ? 260
+            : isMobile
+            ? 0
+            : 80,
+        }}
         transition={{
           duration: 0.25,
           ease: [0.4, 0, 0.2, 1],
@@ -72,6 +94,7 @@ export default function CookbotUI({
         style={{
           height: "100%",
           flexShrink: 0,
+          overflow: "hidden",
           zIndex: 20,
         }}
       >
