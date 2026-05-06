@@ -77,6 +77,39 @@ export default function CookbotUI({
       }}
     >
       {/* =========================
+          MOBILE MENU BUTTON
+      ========================= */}
+      {!(isMobile && isSidebarOpen) && (
+        <button
+          onClick={toggleSidebar}
+          style={{
+            position: "absolute",
+            top: 16,
+            left: 16,
+            zIndex: 40,
+
+            width: 44,
+            height: 44,
+
+            border: "none",
+            borderRadius: 12,
+
+            background: "#4a4a4a",
+            color: "white",
+
+            display: isMobile ? "flex" : "none",
+            alignItems: "center",
+            justifyContent: "center",
+
+            fontSize: 20,
+            cursor: "pointer",
+          }}
+        >
+          ☰
+        </button>
+      )}
+
+      {/* =========================
           SIDEBAR
       ========================= */}
       <motion.div
