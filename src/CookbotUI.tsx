@@ -1,9 +1,8 @@
 import Sidebar from "./components/Sidebar";
 import Chatbot from "./components/Chatbot";
-import { PanelLeftOpen } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
-/* ✅ KEEP TYPES CONSISTENT WITH APP */
+
 type Message = {
   role: "user" | "bot";
   text: string;
@@ -12,7 +11,7 @@ type Message = {
 type Chat = {
   id: number;
   title: string;
-  messages: Message[]; // ✅ IMPORTANT FIX
+  messages: Message[];
 };
 
 type Props = {
@@ -20,7 +19,7 @@ type Props = {
   toggleSidebar: () => void;
 
   chats: Chat[];
-  activeChat: number | null; // ✅ FIXED
+  activeChat: number | null;
   setActiveChat: (id: number) => void;
   createChat: () => void;
 
@@ -36,14 +35,17 @@ type Props = {
 export default function CookbotUI({
   isSidebarOpen,
   toggleSidebar,
+
   chats,
   activeChat,
   setActiveChat,
   createChat,
+
   messages,
   input,
   setInput,
   handleSend,
+
   theme,
   setTheme,
 }: Props) {
@@ -52,61 +54,56 @@ export default function CookbotUI({
       className="appLayout"
       style={{
         display: "flex",
+        width: "100%",
         height: "100vh",
         overflow: "hidden",
+        position: "relative",
       }}
     >
-      {/* OPEN BUTTON */}
-      <AnimatePresence>
-        {!isSidebarOpen && (
-          <motion.button
-            key="open-btn"
-            className="open-sidebar-btn"
-            onClick={toggleSidebar}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
-          >
-            <PanelLeftOpen size={20} />
-          </motion.button>
-        )}
-      </AnimatePresence>
-
-      {/* SIDEBAR */}
-      <AnimatePresence mode="wait">
-        {isSidebarOpen && (
-          <motion.div
-            key="sidebar"
-            initial={{ x: -260, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -260, opacity: 0 }}
-            transition={{ duration: 0.28, ease: "easeInOut" }}
-            style={{
-              height: "100%",
-              flexShrink: 0, // ✅ prevents layout break
-            }}
-          >
-            <Sidebar
-              isSidebarOpen={isSidebarOpen}
-              toggleSidebar={toggleSidebar}
-              chats={chats}
-              activeChat={activeChat}
-              setActiveChat={setActiveChat}
-              createChat={createChat}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* CHATBOT */}
+      {/* =========================
+          SIDEBAR
+      ========================= */}
       <motion.div
         layout
+        transition={{
+          duration: 0.25,
+          ease: [0.4, 0, 0.2, 1],
+        }}
+        style={{
+          height: "100%",
+          flexShrink: 0,
+          zIndex: 20,
+        }}
+      >
+        <Sidebar
+          isSidebarOpen={isSidebarOpen}
+          toggleSidebar={toggleSidebar}
+          chats={chats}
+          activeChat={activeChat}
+          setActiveChat={setActiveChat}
+          createChat={createChat}
+        />
+      </motion.div>
+
+      {/* =========================
+          CHATBOT
+      ========================= */}
+      <motion.div
+        layout
+        transition={{
+          duration: 0.25,
+          ease: [0.4, 0, 0.2, 1],
+        }}
         style={{
           flex: 1,
+          minWidth: 0,
+          height: "100%",
           overflow: "hidden",
-          display: "flex",        // ✅ important
+
+          display: "flex",
           flexDirection: "column",
+
+          position: "relative",
         }}
       >
         <Chatbot
