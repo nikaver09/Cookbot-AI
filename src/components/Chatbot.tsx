@@ -119,7 +119,7 @@ export default function Chatbot({
             ease: "easeOut",
           }}
         >
-          {placeholders[placeholderIndex]}d
+          {placeholders[placeholderIndex]}
         </motion.span>
       </AnimatePresence>
     )}

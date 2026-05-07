@@ -215,16 +215,29 @@ if (!isCookingRelated) {
   const data = await response.json();
 
   const botMessage: Message = {
-    role: "bot",
-    text:
-          `🍽 Recommended Dish: ${data.dish}
+  role: "bot",
+  text:
+`🍳 Based on the ingredients you provided, I recommend cooking:
 
-    📖 Description:
-          ${data.description}
+🍽 ${data.dish}
 
-    👨‍🍳 Cooking Steps:
-          ${data.steps}`,
-  };
+📖 About this dish:
+${data.description}
+
+👨‍🍳 Cooking Guide:
+${data.steps}
+
+⏱ Estimated Cooking Time:
+${data.time || "30-45 minutes"}
+
+🔥 Difficulty:
+${data.difficulty || "Easy"}
+
+💡 Cooking Tip:
+For better flavor, make sure to simmer the dish properly and season gradually while tasting.
+
+Enjoy your meal! 😋`
+};
 
   setChats((prev) =>
     prev.map((chat) =>
