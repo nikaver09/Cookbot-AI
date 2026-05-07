@@ -200,7 +200,7 @@ if (!isCookingRelated) {
     .map((i) => i.trim());
 
   const response = await fetch(
-    "https://cookbot-backend.onrender.com/recommend",
+    "https://cookbot-backend.onrender.com",
     {
       method: "POST",
       headers: {
