@@ -62,6 +62,122 @@ export default function App() {
       text: input,
     };
 
+const lowerInput = input.toLowerCase();
+
+const greetings = [
+  "hi",
+  "hello",
+  "hey",
+  "good morning",
+  "good afternoon",
+  "good evening",
+  "h1",
+  "h3llo",
+  "h3y",
+  "g00d m0rn1ng",
+  "g00d 4ft3rn00n",
+  "g00d 3v3n1ng",
+  "tirada",
+];
+const cookingKeywords = [
+  "cook",
+  "recipe",
+  "dish",
+  "ingredients",
+  "food",
+  "meal",
+  "kitchen",
+  "fried",
+  "boil",
+  "grill",
+  "bake",
+  "chicken",
+  "pork",
+  "beef",
+  "fish",
+  "egg",
+  "rice",
+  "garlic",
+  "onion",
+  "soy sauce",
+  "vinegar",
+  "vegetable",
+  "soup",
+  "adobo",
+  "tinola",
+  "sinigang",
+  "pancit",
+];
+if (greetings.includes(lowerInput)) {
+
+  const greetingReply: Message = {
+    role: "bot",
+    text:
+      `Hello! 👋 I'm Cookbot AI — your smart cooking assistant. I help you discover delicious dishes based on the ingredients you already have at home. Whether you're craving Filipino favorites, quick meals, soups, noodles, or comfort food, I can recommend recipes and guide you step-by-step through the cooking process.
+       
+      🍽 Recipe recommendations
+      📖 Dish descriptions
+      👨‍🍳 Cooking instructions
+      ⏱ Cooking time
+      🔥 Difficulty level
+      Just type the ingredients you have at home to get started!
+Example:
+      "chicken, garlic, soy sauce" 🍳`
+
+  };
+
+  setChats((prev) =>
+    prev.map((chat) =>
+      chat.id === chatId
+        ? {
+            ...chat,
+            messages: [
+            ...chat.messages,
+            userMessage,
+            greetingReply,
+          ],
+          }
+        : chat
+    )
+  );
+
+  setInput("");
+
+  return;
+}
+
+const isCookingRelated = cookingKeywords.some(
+  (keyword) => lowerInput.includes(keyword)
+);
+
+if (!isCookingRelated) {
+
+  const unrelatedReply: Message = {
+    role: "bot",
+    text:
+      "Sorry 😅 I currently only assist with cooking, ingredients, and recipe recommendations.",
+  };
+
+  setChats((prev) =>
+    prev.map((chat) =>
+      chat.id === chatId
+        ? {
+            ...chat,
+            messages: [
+              ...chat.messages,
+              userMessage,
+              unrelatedReply,
+            ],
+          }
+        : chat
+    )
+  );
+
+  setInput("");
+
+  return;
+}
+
     setChats((prev) =>
       prev.map((chat) =>
         chat.id === chatId
@@ -101,10 +217,13 @@ export default function App() {
   const botMessage: Message = {
     role: "bot",
     text:
-      `Recommended Dish: ${data.dish}
+          `🍽 Recommended Dish: ${data.dish}
 
-Steps:
-${data.steps}`,
+    📖 Description:
+          ${data.description}
+
+    👨‍🍳 Cooking Steps:
+          ${data.steps}`,
   };
 
   setChats((prev) =>

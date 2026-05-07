@@ -34,6 +34,7 @@ def predict_dish(ingredients):
         data["dish"] == prediction
     ].iloc[0]
 
+    description = row["description"]
     steps = row["steps"]
 
-    return prediction, steps
+    return prediction, description, steps
