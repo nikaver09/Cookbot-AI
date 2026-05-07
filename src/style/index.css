@@ -357,6 +357,10 @@ body {
   display: inline-block;
 
   animation: fadeIn 0.18s ease;
+
+  white-space: pre-wrap;
+
+  text-align: justify;
 }
 
 

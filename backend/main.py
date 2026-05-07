@@ -33,11 +33,12 @@ def home():
 
 def recommend(data: Ingredients):
 
-    dish, steps = predict_dish(
+    dish, description, steps = predict_dish(
         data.ingredients
     )
 
     return {
         "dish": dish,
+        "description": description,
         "steps": steps
     }
