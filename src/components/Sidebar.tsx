@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import {
   motion,
   AnimatePresence,
@@ -6,11 +8,18 @@ import {
 import {
   PanelLeft,
   MessageSquarePlus,
+  MoreHorizontal,
+  Pin,
+  Archive,
+  Trash2,
 } from "lucide-react";
 
 type Chat = {
   id: number;
   title: string;
+
+  pinned?: boolean;
+  archived?: boolean;
 };
 
 type Props = {
@@ -19,9 +28,24 @@ type Props = {
 
   chats: Chat[];
   activeChat: number | null;
-  setActiveChat: (id: number) => void;
+
+  setActiveChat: (
+    id: number
+  ) => void;
 
   createChat: () => void;
+
+  deleteChat: (
+    id: number
+  ) => void;
+
+  pinChat: (
+    id: number
+  ) => void;
+
+  archiveChat: (
+    id: number
+  ) => void;
 };
 
 const SIDEBAR_WIDTH = {
@@ -38,10 +62,15 @@ export default function Sidebar({
   setActiveChat,
 
   createChat,
-}: Props) {
-  const isExpanded = isSidebarOpen;
 
-  /* ✅ RELOAD WEBSITE */
+  deleteChat,
+  pinChat,
+  archiveChat,
+}: Props) {
+  const isExpanded =
+    isSidebarOpen;
+
+  /* RELOAD WEBSITE */
   const handleLogoClick = () => {
     window.location.reload();
   };
@@ -53,7 +82,9 @@ export default function Sidebar({
         {!isExpanded && (
           <motion.button
             className="floating-toggle"
-            onClick={toggleSidebar}
+            onClick={
+              toggleSidebar
+            }
             initial={{
               opacity: 0,
               scale: 0.8,
@@ -81,14 +112,18 @@ export default function Sidebar({
               border: "none",
               borderRadius: 10,
 
-              background: "#4a4a4a",
+              background:
+                "#4a4a4a",
+
               color: "#fff",
 
               cursor: "pointer",
 
               display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              alignItems:
+                "center",
+              justifyContent:
+                "center",
             }}
           >
             <PanelLeft size={18} />
@@ -104,21 +139,26 @@ export default function Sidebar({
             ? SIDEBAR_WIDTH.expanded
             : SIDEBAR_WIDTH.collapsed,
 
-          backgroundColor: isExpanded
-            ? "#3d3d3d"
-            : "transparent",
+          backgroundColor:
+            isExpanded
+              ? "#3d3d3d"
+              : "transparent",
 
-          borderRightColor: isExpanded
-            ? "rgba(255,255,255,0.05)"
-            : "transparent",
+          borderRightColor:
+            isExpanded
+              ? "rgba(255,255,255,0.05)"
+              : "transparent",
         }}
         transition={{
           duration: 0.25,
-          ease: [0.4, 0, 0.2, 1],
+          ease: [
+            0.4, 0, 0.2, 1,
+          ],
         }}
         style={{
           display: "flex",
-          flexDirection: "column",
+          flexDirection:
+            "column",
 
           overflow: "hidden",
 
@@ -136,11 +176,14 @@ export default function Sidebar({
         <div
           style={{
             display: "flex",
-            alignItems: "center",
+            alignItems:
+              "center",
+
             justifyContent:
               "space-between",
 
             padding: "16px",
+
             minHeight: "72px",
           }}
         >
@@ -150,10 +193,9 @@ export default function Sidebar({
               <motion.img
                 src="/cookbot11.png"
                 alt="Cookbot Logo"
-
-                /* ✅ CLICK RELOAD */
-                onClick={handleLogoClick}
-
+                onClick={
+                  handleLogoClick
+                }
                 initial={{
                   opacity: 0,
                   scale: 0.8,
@@ -183,7 +225,8 @@ export default function Sidebar({
                   objectFit:
                     "contain",
 
-                  cursor: "pointer",
+                  cursor:
+                    "pointer",
                 }}
               />
             )}
@@ -224,10 +267,13 @@ export default function Sidebar({
 
                   borderRadius: 8,
 
-                  cursor: "pointer",
+                  cursor:
+                    "pointer",
 
                   display: "flex",
-                  alignItems: "center",
+                  alignItems:
+                    "center",
+
                   justifyContent:
                     "center",
                 }}
@@ -274,7 +320,9 @@ export default function Sidebar({
                 }}
               >
                 <motion.button
-                  onClick={createChat}
+                  onClick={
+                    createChat
+                  }
                   whileHover={{
                     scale: 1.03,
                   }}
@@ -285,6 +333,7 @@ export default function Sidebar({
                     width: "100%",
 
                     display: "flex",
+
                     alignItems:
                       "center",
 
@@ -334,50 +383,37 @@ export default function Sidebar({
                     No history yet
                   </p>
                 ) : (
-                  chats.map((chat) => {
-                    const isActive =
-                      activeChat ===
-                      chat.id;
+                  chats.map(
+                    (chat) => {
+                      const isActive =
+                        activeChat ===
+                        chat.id;
 
-                    return (
-                      <motion.div
-                        key={chat.id}
-                        onClick={() =>
-                          setActiveChat(
+                      return (
+                        <ChatItem
+                          key={
                             chat.id
-                          )
-                        }
-                        whileHover={{
-                          scale: 1.02,
-                        }}
-                        whileTap={{
-                          scale: 0.98,
-                        }}
-                        style={{
-                          padding:
-                            "12px 14px",
-
-                          borderRadius: 12,
-
-                          marginBottom: 8,
-
-                          cursor:
-                            "pointer",
-
-                          background:
+                          }
+                          chat={chat}
+                          isActive={
                             isActive
-                              ? "rgba(255,255,255,0.12)"
-                              : "transparent",
-
-                          color:
-                            "#fff",
-                        }}
-                      >
-                        {chat.title ||
-                          "Untitled"}
-                      </motion.div>
-                    );
-                  })
+                          }
+                          setActiveChat={
+                            setActiveChat
+                          }
+                          deleteChat={
+                            deleteChat
+                          }
+                          pinChat={
+                            pinChat
+                          }
+                          archiveChat={
+                            archiveChat
+                          }
+                        />
+                      );
+                    }
+                  )
                 )}
               </div>
             </motion.div>
@@ -385,5 +421,325 @@ export default function Sidebar({
         </AnimatePresence>
       </motion.aside>
     </>
+  );
+}
+
+/* CHAT ITEM */
+function ChatItem({
+  chat,
+  isActive,
+  setActiveChat,
+
+  deleteChat,
+  pinChat,
+  archiveChat,
+}: any) {
+  const [openMenu, setOpenMenu] =
+    useState(false);
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        marginBottom: 8,
+      }}
+    >
+      {/* CHAT BUTTON */}
+      <motion.div
+        onClick={() =>
+          setActiveChat(chat.id)
+        }
+        whileHover={{
+          scale: 1.02,
+        }}
+        whileTap={{
+          scale: 0.98,
+        }}
+        style={{
+          padding: "12px 14px",
+
+          borderRadius: 12,
+
+          cursor: "pointer",
+
+          display: "flex",
+          alignItems: "center",
+
+          justifyContent:
+            "space-between",
+
+          background: isActive
+            ? "rgba(255,255,255,0.12)"
+            : "transparent",
+
+          color: "#fff",
+
+          border: chat.pinned
+            ? "1px solid rgba(255,255,255,0.14)"
+            : "1px solid transparent",
+
+          opacity:
+            chat.archived
+              ? 0.5
+              : 1,
+
+          transition:
+            "0.2s ease",
+        }}
+      >
+        {/* TITLE */}
+        <div
+          style={{
+            display: "flex",
+            alignItems:
+              "center",
+
+            gap: 8,
+
+            flex: 1,
+
+            overflow: "hidden",
+          }}
+        >
+          {chat.pinned && (
+            <Pin size={14} />
+          )}
+
+          <span
+            style={{
+              overflow: "hidden",
+
+              whiteSpace:
+                "nowrap",
+
+              textOverflow:
+                "ellipsis",
+            }}
+          >
+            {chat.title ||
+              "Untitled"}
+          </span>
+        </div>
+
+        {/* 3 DOT BUTTON */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+
+            setOpenMenu(
+              !openMenu
+            );
+          }}
+          style={{
+            background:
+              "transparent",
+
+            border: "none",
+
+            color: "#aaa",
+
+            cursor: "pointer",
+
+            width: 30,
+            height: 30,
+
+            borderRadius: 8,
+
+            display: "flex",
+
+            alignItems:
+              "center",
+
+            justifyContent:
+              "center",
+
+            flexShrink: 0,
+
+            transition:
+              "0.2s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background =
+              "rgba(255,255,255,0.08)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background =
+              "transparent";
+          }}
+        >
+          <MoreHorizontal
+            size={18}
+          />
+        </button>
+      </motion.div>
+
+      {/* DROPDOWN */}
+      <AnimatePresence>
+        {openMenu && (
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: -5,
+              scale: 0.98,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              scale: 1,
+            }}
+            exit={{
+              opacity: 0,
+              y: -5,
+              scale: 0.98,
+            }}
+            transition={{
+              duration: 0.15,
+            }}
+            style={{
+              position:
+                "absolute",
+
+              top: 50,
+              right: 0,
+
+              width: 190,
+
+              background:
+                "#2b2b2b",
+
+              borderRadius: 18,
+
+              padding: 8,
+
+              zIndex: 1000,
+
+              border:
+                "1px solid rgba(255,255,255,0.06)",
+
+              boxShadow:
+                "0 10px 30px rgba(0,0,0,0.45)",
+
+              backdropFilter:
+                "blur(10px)",
+            }}
+          >
+            {/* PIN */}
+            <MenuItem
+              icon={
+                <Pin size={16} />
+              }
+              text={
+                chat.pinned
+                  ? "Unpin chat"
+                  : "Pin chat"
+              }
+              onClick={() => {
+                pinChat(chat.id);
+
+                setOpenMenu(
+                  false
+                );
+              }}
+            />
+
+            {/* ARCHIVE */}
+            <MenuItem
+              icon={
+                <Archive
+                  size={16}
+                />
+              }
+              text={
+                chat.archived
+                  ? "Unarchive"
+                  : "Archive"
+              }
+              onClick={() => {
+                archiveChat(
+                  chat.id
+                );
+
+                setOpenMenu(
+                  false
+                );
+              }}
+            />
+
+            {/* DELETE */}
+            <MenuItem
+              icon={
+                <Trash2
+                  size={16}
+                />
+              }
+              text="Delete"
+              danger
+              onClick={() => {
+                deleteChat(
+                  chat.id
+                );
+
+                setOpenMenu(
+                  false
+                );
+              }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* MENU ITEM */
+function MenuItem({
+  icon,
+  text,
+  danger,
+  onClick,
+}: any) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        width: "100%",
+
+        display: "flex",
+        alignItems: "center",
+
+        gap: 12,
+
+        padding: "12px 14px",
+
+        borderRadius: 12,
+
+        border: "none",
+
+        background:
+          "transparent",
+
+        color: danger
+          ? "#ff5b5b"
+          : "#fff",
+
+        cursor: "pointer",
+
+        fontSize: 14,
+
+        transition:
+          "0.2s ease",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background =
+          "rgba(255,255,255,0.06)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background =
+          "transparent";
+      }}
+    >
+      {icon}
+      {text}
+    </button>
   );
 }
