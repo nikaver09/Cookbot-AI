@@ -793,3 +793,22 @@ body {
     height: 64px;
   }
 }
+
+.Thinking {
+  opacity: 0.7;
+  font-style: italic;
+  animation: pulse 1s infinite;
+  color: #3a3b3e;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.4;
+  }
+}

@@ -1,7 +1,12 @@
 import Sidebar from "./components/Sidebar";
 import Chatbot from "./components/Chatbot";
+
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+
+import {
+  useEffect,
+  useState,
+} from "react";
 
 type Message = {
   role: "user" | "bot";
@@ -12,6 +17,9 @@ type Chat = {
   id: number;
   title: string;
   messages: Message[];
+
+  pinned?: boolean;
+  archived?: boolean;
 };
 
 type Props = {
@@ -19,17 +27,43 @@ type Props = {
   toggleSidebar: () => void;
 
   chats: Chat[];
+
   activeChat: number | null;
-  setActiveChat: (id: number) => void;
+
+  setActiveChat: (
+    id: number
+  ) => void;
+
   createChat: () => void;
 
+  /* NEW FUNCTIONS */
+  deleteChat: (
+    id: number
+  ) => void;
+
+  pinChat: (
+    id: number
+  ) => void;
+
+  archiveChat: (
+    id: number
+  ) => void;
+
   messages: Message[];
+
   input: string;
-  setInput: (val: string) => void;
-  handleSend: () => void;
+
+  setInput: (
+    val: string
+  ) => void;
+
+  handleSend: () => Promise<void>;
 
   theme: "dark" | "light";
-  setTheme: (t: "dark" | "light") => void;
+
+  setTheme: (
+    t: "dark" | "light"
+  ) => void;
 };
 
 export default function CookbotUI({
@@ -37,31 +71,49 @@ export default function CookbotUI({
   toggleSidebar,
 
   chats,
+
   activeChat,
   setActiveChat,
+
   createChat,
 
+  /* NEW */
+  deleteChat,
+  pinChat,
+  archiveChat,
+
   messages,
+
   input,
   setInput,
+
   handleSend,
 
   theme,
   setTheme,
 }: Props) {
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] =
+    useState(false);
 
   useEffect(() => {
     const checkScreen = () => {
-      setIsMobile(window.innerWidth <= 768);
+      setIsMobile(
+        window.innerWidth <= 768
+      );
     };
 
     checkScreen();
 
-    window.addEventListener("resize", checkScreen);
+    window.addEventListener(
+      "resize",
+      checkScreen
+    );
 
     return () => {
-      window.removeEventListener("resize", checkScreen);
+      window.removeEventListener(
+        "resize",
+        checkScreen
+      );
     };
   }, []);
 
@@ -70,39 +122,66 @@ export default function CookbotUI({
       className="appLayout"
       style={{
         display: "flex",
+
         width: "100%",
+
         height: "100dvh",
+
         overflow: "hidden",
+
         position: "relative",
+
+        background:
+          theme === "dark"
+            ? "#1f1f1f"
+            : "#ffffff",
       }}
     >
       {/* =========================
           MOBILE MENU BUTTON
       ========================= */}
-      {!(isMobile && isSidebarOpen) && (
+      {!(isMobile &&
+        isSidebarOpen) && (
         <button
-          onClick={toggleSidebar}
+          onClick={
+            toggleSidebar
+          }
           style={{
             position: "absolute",
+
             top: 16,
             left: 16,
+
             zIndex: 40,
 
             width: 44,
             height: 44,
 
             border: "none",
+
             borderRadius: 12,
 
-            background: "#4a4a4a",
+            background:
+              "#4a4a4a",
+
             color: "white",
 
-            display: isMobile ? "flex" : "none",
-            alignItems: "center",
-            justifyContent: "center",
+            display: isMobile
+              ? "flex"
+              : "none",
+
+            alignItems:
+              "center",
+
+            justifyContent:
+              "center",
 
             fontSize: 20,
+
             cursor: "pointer",
+
+            transition:
+              "0.2s ease",
           }}
         >
           ☰
@@ -122,22 +201,56 @@ export default function CookbotUI({
         }}
         transition={{
           duration: 0.25,
-          ease: [0.4, 0, 0.2, 1],
+
+          ease: [
+            0.4, 0, 0.2, 1,
+          ],
         }}
         style={{
           height: "100%",
+
           flexShrink: 0,
+
           overflow: "hidden",
+
           zIndex: 20,
+
+          position: isMobile
+            ? "absolute"
+            : "relative",
+
+          left: 0,
+          top: 0,
         }}
       >
         <Sidebar
-          isSidebarOpen={isSidebarOpen}
-          toggleSidebar={toggleSidebar}
+          isSidebarOpen={
+            isSidebarOpen
+          }
+          toggleSidebar={
+            toggleSidebar
+          }
           chats={chats}
-          activeChat={activeChat}
-          setActiveChat={setActiveChat}
-          createChat={createChat}
+          activeChat={
+            activeChat
+          }
+          setActiveChat={
+            setActiveChat
+          }
+          createChat={
+            createChat
+          }
+
+          /* NEW */
+          deleteChat={
+            deleteChat
+          }
+
+          pinChat={pinChat}
+
+          archiveChat={
+            archiveChat
+          }
         />
       </motion.div>
 
@@ -148,28 +261,36 @@ export default function CookbotUI({
         layout
         transition={{
           duration: 0.25,
-          ease: [0.4, 0, 0.2, 1],
+
+          ease: [
+            0.4, 0, 0.2, 1,
+          ],
         }}
         style={{
           flex: 1,
+
           minWidth: 0,
+
           height: "100%",
+
           overflow: "hidden",
 
           display: "flex",
-          flexDirection: "column",
+
+          flexDirection:
+            "column",
 
           position: "relative",
         }}
       >
         <Chatbot
-          messages={messages}
-          input={input}
-          setInput={setInput}
-          handleSend={handleSend}
-          theme={theme}
-          setTheme={setTheme}
-        />
+            messages={messages}
+            input={input}
+            setInput={setInput}
+            handleSend={handleSend}
+            theme={theme}
+            setTheme={setTheme}
+/>
       </motion.div>
     </div>
   );
